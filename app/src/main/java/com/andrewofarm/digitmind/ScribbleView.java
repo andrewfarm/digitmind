@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -22,11 +21,13 @@ public class ScribbleView extends View {
 
     private float lastX, lastY;
 
+    private ScribbleListener scribbleListener;
+
     public ScribbleView(Context context, AttributeSet attrs) {
         super(context, attrs);
         paint = new Paint();
-        paint.setStrokeWidth(10);
-        paint.setColor(Color.DKGRAY);
+        paint.setStrokeWidth(50);
+        paint.setColor(Color.BLACK);
         paint.setStrokeCap(Paint.Cap.ROUND);
         post(new Runnable() {
             @Override
@@ -34,8 +35,22 @@ public class ScribbleView extends View {
                 bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
                 canvas = new Canvas(bitmap);
                 clear();
+                update();
             }
         });
+    }
+
+    public void setScribbleListener(ScribbleListener scribbleListener) {
+        this.scribbleListener = scribbleListener;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    private void update() {
+        scribbleListener.onUpdate(this);
+        invalidate();
     }
 
     public void clear() {
@@ -62,9 +77,11 @@ public class ScribbleView extends View {
                 canvas.drawLine(lastX, lastY, thisX, thisY, paint);
                 lastX = thisX;
                 lastY = thisY;
+                update();
                 break;
         }
-        invalidate();
         return true;
     }
+
+
 }
