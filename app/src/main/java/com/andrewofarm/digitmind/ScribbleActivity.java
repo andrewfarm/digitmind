@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-public class MainActivity extends AppCompatActivity implements ScribbleListener {
+public class ScribbleActivity extends AppCompatActivity implements ScribbleListener {
 
     private ScribbleView scribbleView;
     private ImageView miniView;
