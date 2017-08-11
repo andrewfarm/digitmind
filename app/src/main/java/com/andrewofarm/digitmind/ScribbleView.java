@@ -26,7 +26,7 @@ public class ScribbleView extends View {
     public ScribbleView(Context context, AttributeSet attrs) {
         super(context, attrs);
         paint = new Paint();
-        paint.setStrokeWidth(50);
+        paint.setStrokeWidth(75);
         paint.setColor(Color.BLACK);
         paint.setStrokeCap(Paint.Cap.ROUND);
         post(new Runnable() {
@@ -35,7 +35,6 @@ public class ScribbleView extends View {
                 bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
                 canvas = new Canvas(bitmap);
                 clear();
-                update();
             }
         });
     }
