@@ -38,17 +38,4 @@ public class Network {
         }
         return activations;
     }
-
-    public int recognize(float[][] digitPixels) {
-        float[][] outputActivations = feedforward(digitPixels);
-        float maxActivation = outputActivations[0][0];
-        int maxIndex = 0;
-        for (int i = 0; i < outputActivations.length; i++) {
-            if (outputActivations[i][0] > maxActivation) {
-                maxActivation = outputActivations[i][0];
-                maxIndex = i;
-            }
-        }
-        return maxIndex;
-    }
 }

@@ -17,6 +17,7 @@ public class ScribbleActivity extends AppCompatActivity implements ScribbleListe
     private ScribbleView scribbleView;
     private ImageView miniView;
     private TextView outputView;
+    private ConfidenceBarView confidenceBarView;
 
     private Bitmap digitBitmap;
     private Canvas digitCanvas;
@@ -32,6 +33,7 @@ public class ScribbleActivity extends AppCompatActivity implements ScribbleListe
         scribbleView = (ScribbleView) findViewById(R.id.scribbleview);
         miniView = (ImageView) findViewById(R.id.miniview);
         outputView = (TextView) findViewById(R.id.outputview);
+        confidenceBarView = (ConfidenceBarView) findViewById(R.id.confidencebarview) ;
         scribbleView.setScribbleListener(this);
         scribbleView.post(new Runnable() {
             @Override
@@ -43,6 +45,7 @@ public class ScribbleActivity extends AppCompatActivity implements ScribbleListe
         digitCanvas = new Canvas(digitBitmap);
         network = NetworkLoader.loadNetwork(this, R.raw.nn);
         outputView.setText("");
+        confidenceBarView.setConfidence(0);
     }
 
     private void update() {
@@ -55,18 +58,35 @@ public class ScribbleActivity extends AppCompatActivity implements ScribbleListe
     public void clearScribble(View view) {
         scribbleView.clear();
         outputView.setText("");
+        confidenceBarView.setConfidence(0);
         update();
     }
 
-    @Override
-    public void onUpdate(ScribbleView scribbleView) {
-        update();
+    private void recognize() {
         int[] pixels = new int[784];
         smallBitmap.getPixels(pixels, 0, 28, 0, 0, 28, 28);
         for (int i = 0; i < 784; i++) {
             inputActivations[i][0] = 1.0f - (float) Color.red(pixels[i]) / 0xFF;
         }
-        int output = network.recognize(inputActivations);
-        outputView.setText(String.valueOf(output));
+
+        float[][] outputActivations = network.feedforward(inputActivations);
+        float maxActivation = outputActivations[0][0];
+        float sum = 0;
+        int maxIndex = 0;
+        for (int i = 0; i < outputActivations.length; i++) {
+            sum += outputActivations[i][0];
+            if (outputActivations[i][0] > maxActivation) {
+                maxActivation = outputActivations[i][0];
+                maxIndex = i;
+            }
+        }
+        outputView.setText(String.valueOf(maxIndex));
+        confidenceBarView.setConfidence(maxActivation / sum * 2 - 1);
+    }
+
+    @Override
+    public void onUpdate(ScribbleView scribbleView) {
+        update();
+        recognize();
     }
 }
